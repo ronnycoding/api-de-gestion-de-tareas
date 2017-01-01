@@ -61,6 +61,13 @@ class UserController extends BaseController {
 	{
 		$request->only(User::$updateFields);
 
+		$validator = Validator::make($request->all(), User::rules());
+
+		if ($validator->fails())
+		{
+			$this->response->error($validator->messages(), 200);
+		}
+
 		$userAuth = \Auth::user();
 
 		$user = User::find($id);
