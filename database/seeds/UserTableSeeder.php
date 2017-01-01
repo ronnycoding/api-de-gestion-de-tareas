@@ -13,11 +13,11 @@ class UserTableSeeder extends Seeder
     {
         DB::table('users')->delete();
         \App\Api\V1\Models\User::create(array(
-            'name'     => 'Esteban',
-            'last_name' => 'Garcia',
-            'company_name' => 'Shema App',
-            'email'    => 'logs@shemapp.com',
-            'password' => \Illuminate\Support\Facades\Hash::make('logspassword'),
+            'firstname'=> 'Ronny',
+            'lastname' => 'Freites',
+            'email'    => 'ronnyangelo.freites@gmail.com',
+	        'admin'    => true,
+            'password' => \Illuminate\Support\Facades\Hash::make('nextdots'),
         ));
     }
 }

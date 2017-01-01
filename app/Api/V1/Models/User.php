@@ -1,4 +1,10 @@
 <?php namespace App\Api\V1\Models;
+/**
+ * Created by PhpStorm.
+ * User: Ronny
+ * Date: 12/29/16
+ * Time: 18:35
+ */
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
@@ -8,17 +14,27 @@ class User extends Model implements Authenticatable, JWTSubject{
 
 	use \Illuminate\Auth\Authenticatable;
 
-	protected $fillable = ["name", "last_name", "company_name", "email", "password"];
+	protected $primarykey = 'id';
+
+	protected $fillable = ['firstname', 'lastname', 'email', 'email', 'password','admin'];
+
+	public static $storeFields = ['firstname', 'lastname', 'email', 'email', 'password','admin'];
+
+	public static $updateFields = ['firstname', 'lastname', 'email', 'email', 'password','admin'];
 
 	protected $dates = ["deleted_at"];
 
-	public static $rules = [
-		"name" => "required",
-		"last_name" => "required",
-		"company_name" => "required",
-		"email" => "unique|email|required",
-		"password" => "required",
-	];
+	public static function rules()
+	{
+		return [
+			'firstname' => 'required',
+			'lastname' => 'required',
+			'email' => 'unique:users|email|required',
+			'password' => 'required',
+			'admin' => 'boolean',
+			'token' => 'required',
+		];
+	}
 
 	/**
 	 * Get the identifier that will be stored in the subject claim of the JWT
@@ -37,5 +53,15 @@ class User extends Model implements Authenticatable, JWTSubject{
 	public function getJWTCustomClaims()
 	{
 		return [];
+	}
+
+	/**
+	 * Eloquent relationship
+	 *
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+	public function tasks()
+	{
+		return $this->hasMany(Task::class);
 	}
 }
