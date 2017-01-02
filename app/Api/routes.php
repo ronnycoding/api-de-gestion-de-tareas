@@ -16,9 +16,22 @@ $api->version('v1', ['middleware' => 'api.auth', 'providers' => 'jwt'], function
 	/**
 	 * Method: get
 	 *  token
+	 */
+	$api->get('tasks/{idTask}', 'App\Api\V1\Controllers\TaskController@show');
+
+	/**
+	 * Method: get
+	 *  token
 	 *  postman: http://localhost:8000/api/tasks?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGhlbnRpY2F0ZSIsImlhdCI6MTQ4MzMyMDcyMiwibmJmIjoxNDgzMzIwNzIyLCJqdGkiOiIxMDVmMzYxNDU2Mjk2MDVlMjBhYmQ2YjY0M2Q4NDgwOSIsInN1YiI6MX0.HIXi9uE2etSQvIzzo5F7Pt3yBGXbTtKvADHS8sY3hfY
 	 */
 	$api->get('tasks', 'App\Api\V1\Controllers\TaskController@showAll');
+
+	/**
+	 * Method
+	 *  token
+	 *  name
+	 */
+	$api->get('tasks/{idTask}/priorities', 'App\Api\V1\Controllers\PrioritiesController@showAll');
 
 	/**
 	 * Method
@@ -45,17 +58,12 @@ $api->version('v1', ['middleware' => 'api.auth', 'providers' => 'jwt'], function
 	 */
 
 	/**
-	 * Method: get
-	 *  token
-	 */
-	$api->get('tasks/{idTask}', 'App\Api\V1\Controllers\TaskController@show');
-
-	/**
 	 * Method put
 	 *  token
 	 *  title
 	 *  description
 	 *  due_description AAAA-MM-DD
+	 *  postman: http://localhost:8000/api/tasks/15?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGhlbnRpY2F0ZSIsImlhdCI6MTQ4MzMzMzk5NCwibmJmIjoxNDgzMzMzOTk0LCJqdGkiOiJlYWI1MThjY2NlYjRjY2YxNzA2NmY5YmJkMTA5MDdiZiIsInN1YiI6M30.1wWweewv0KIcMQAQh6nNWh3lPWw9aLVXXm7iBipZu14&title=actualizar3&description=ban9&due_description=2017-09-13
 	 */
 	$api->put('tasks/{idTask}', 'App\Api\V1\Controllers\TaskController@update');
 

@@ -23,18 +23,15 @@ class TaskController extends BaseController{
 			return $this->response->errorNotFound("Task not found");
 		}
 
-
-		dd($task);
-
 		if($user->admin)
 		{
 			return $task;	
 		}else{
-			if($user->id == $task->user()->id)
+			if($user->id == $task->user->id)
 			{
 				return $task;
 			}else{
-				return $this->response->errorNotFound("Task not found");
+				return $this->response->error('Not admin privileges', 200);
 			}
 		}
 		
@@ -116,7 +113,7 @@ class TaskController extends BaseController{
 				$task->save();
 				return response()->json([$task->id,$task]);
 		}else{
-			if($task->user()->id == $userAuth->id)
+			if($task->user->id == $userAuth->id)
 			{
 				if($task->title != null)
 					$task->title = $request->title;
@@ -146,7 +143,7 @@ class TaskController extends BaseController{
 			$task->delete();
 			return response()->json([$task->id,$task]);
 		}else{
-			if($task->user()->id == $userAuth->id)
+			if($task->user->id == $userAuth->id)
 			{
 				$task->delete();
 				return response()->json([$task->id,$task]);

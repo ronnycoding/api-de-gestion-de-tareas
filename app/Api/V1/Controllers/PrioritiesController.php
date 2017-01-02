@@ -37,6 +37,33 @@ class PrioritiesController extends BaseController{
 		return $task;
 	}
 
+	public function showAll()
+	{
+		$user = \Auth::user();
+
+		$priority = Priorities::all();
+
+		if(empty($priority)){
+			return $this->response->errorNotFound("Priority Not Found");
+		}
+
+		if($user->admin)
+		{
+			return $priority;
+		}else{
+			// $priority = Priorities::with('priorities.tasks')->where('user_id','=',$user->id)->get();
+
+			$priority = Priorities::with(['priorities.tasks' => function ($query) {
+    			$query->where('user_id','=',$user->id)->orderBy('created_at', 'desc');
+			}])->get();
+
+			if($priority->IsEmpty()){
+				return $this->response->errorNotFound("Priority Not Found");
+			}
+			return $priority;
+		}
+	}
+
 	public function store($idTask, Request $request)
 	{
 		$request->only(Priorities::$storeFields);
@@ -82,14 +109,7 @@ class PrioritiesController extends BaseController{
 			return $this->response->error('Task not found', 200);
 		}
 
-		$user = \Auth::user();
-
-		if($user->admin)
-		{
-			$priority = Priorities::find($idPriority);
-		}else{
-			$priority = $user->tasks->priorities()->contains($idPriority);
-		}
+		$priority = Priorities::find($idPriority);
 
 		if(empty($priority)){
 			return $this->response->errorNotFound("Priority not found");
@@ -100,19 +120,22 @@ class PrioritiesController extends BaseController{
 		if($userAuth->admin){
 			if($priority->name != null)
 			{
-				$priority->name = $request->name;
-				$priority->save();
-				return response()->json([$priority->id,$priority]);
+				if($priority->name =! $request->name)
+					$priority->name = $request->name;
+						$priority->save();
+							return response()->json([$priority->id,$priority]);
 			}
 		}else{
-			if($priority->task()->user()->id == $userAuth->id)
+			if($priority->task->user->id == $userAuth->id)
 			{
 				if($priority->name != null)
 				{
 					$priority->name = $request->name;
 					$priority->save();
+					return response()->json([$priority->id,$priority]);
+				}else{
+					return $this->response->error('Priority not found',200);
 				}
-				return response()->json([$priority->id,$priority]);
 			}else{
 				return $this->response->error('Priority not found',200);
 			}
