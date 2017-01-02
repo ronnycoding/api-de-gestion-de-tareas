@@ -28,6 +28,24 @@ class UserController extends BaseController {
 		}
 	}
 
+	public function showAll()
+	{
+		$userAuth = \Auth::user();
+		$user = User::all();
+
+		if($user->IsEmpty()){
+			return $this->response->errorNotFound("Users Not Found");
+		}
+
+		if($userAuth->admin)
+		{
+			return $user;
+		}else{
+			$this->response->error('Not admin privileges', 200);
+			
+		}
+	}
+
 	public function store(Request $request)
 	{
 		$request->only(User::$storeFields);
@@ -72,23 +90,20 @@ class UserController extends BaseController {
 
 		$user = User::find($id);
 
+		if(empty($user)){
+			return $this->response->errorNotFound("User Not Found");
+		}
+
 		if($userAuth->admin){
 			if(!empty($user))
 			{
-				if($user->firstname != null)
+				if($request->firstname != null)
 					$user->firstname = $request->firstname;
-				if($user->lastname != null)
+				if($request->lastname != null)
 					$user->lastname = $request->lastname;
-				if($user->email != null)
+				if($request->email != null)
 				{
-					$checkEmail = User::where('email','=',$request->email)->first();
-					if(!empty($checkEmail))
-					{
-						if($checkEmail->email != $request->email)
-						{
-							$user->email = $request->email;
-						}
-					}
+					$user->email = $request->email;
 				}
 				if($user->password != null)
 					$user->password = \Illuminate\Support\Facades\Hash::make($request->password);

@@ -17,18 +17,49 @@ class TaskController extends BaseController{
 	{
 		$user = \Auth::user();
 
-		if($user->admin)
-		{
-			$task = Task::find($id);
-		}else{
-			$task = $user->tasks->contains($id);
-		}
+		$task = Task::find($id);
 
 		if(empty($task)){
 			return $this->response->errorNotFound("Task not found");
 		}
 
-		return $task;
+
+		dd($task);
+
+		if($user->admin)
+		{
+			return $task;	
+		}else{
+			if($user->id == $task->user()->id)
+			{
+				return $task;
+			}else{
+				return $this->response->errorNotFound("Task not found");
+			}
+		}
+		
+	}
+
+	public function showAll()
+	{
+		$user = \Auth::user();
+
+		$task = Task::all();
+
+		if(empty($task)){
+			return $this->response->errorNotFound("Tasks Not Found");
+		}
+
+		if($user->admin)
+		{
+			return $task;
+		}else{
+			$task = Task::where('user_id','=',$user->id)->get();
+			if($task->IsEmpty()){
+				return $this->response->errorNotFound("Tasks Not Found");
+			}
+			return $task;
+		}
 	}
 
 	public function store(Request $request)
@@ -55,7 +86,7 @@ class TaskController extends BaseController{
 		return $this->response->created($task->id,$task);
 	}
 
-	public function update($id, Request $request)
+	public function update($idTask, Request $request)
 	{
 		$request->only(Task::$storeFields);
 
@@ -68,10 +99,24 @@ class TaskController extends BaseController{
 
 		$userAuth = \Auth::user();
 
-		$task = Task::find($id);
+		$task = Task::find($idTask);
+
+		if(empty($task)){
+			return $this->response->errorNotFound("Tasks Not Found");
+		}
 
 		if($userAuth->admin){
-			if(!empty($task))
+
+			if($task->title != null)
+					$task->title = $request->title;
+				if($task->description != null)
+					$task->description = $request->description;
+				if($task->due_description != null)
+					$task->due_description = $request->due_description;
+				$task->save();
+				return response()->json([$task->id,$task]);
+		}else{
+			if($task->user()->id == $userAuth->id)
 			{
 				if($task->title != null)
 					$task->title = $request->title;
@@ -82,24 +127,7 @@ class TaskController extends BaseController{
 				$task->save();
 				return response()->json([$task->id,$task]);
 			}else{
-				return $this->response->error('Task not found',200);
-			}
-		}else{
-			if(!empty($task))
-			{
-				if($task->user()->id == $userAuth->id)
-				{
-					if($task->title != null)
-						$task->title = $request->title;
-					if($task->description != null)
-						$task->description = $request->description;
-					if($task->due_description != null)
-						$task->due_description = $request->due_description;
-					$task->save();
-					return response()->json([$task->id,$task]);
-				}else{
-					return $this->response->error('Task not found',200);
-				}
+				return $this->response->error('Tasks not found',200);
 			}
 		}
 	}
@@ -110,7 +138,7 @@ class TaskController extends BaseController{
 		$task = Task::find($id);
 
 		if(empty($task)){
-			return $this->response->errorNotFound("Priority Not Found");
+			return $this->response->errorNotFound("Tasks Not Found");
 		}
 
 		if($userAuth->admin)
@@ -123,7 +151,7 @@ class TaskController extends BaseController{
 				$task->delete();
 				return response()->json([$task->id,$task]);
 			}else{
-				$this->response->error('Not admin privileges', 200);
+				return $this->response->error('Not admin privileges', 200);
 			}
 		}
 	}
