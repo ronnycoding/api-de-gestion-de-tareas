@@ -17,7 +17,7 @@ class UserTableSeeder extends Seeder
             'lastname' => 'Freites',
             'email'    => 'ronnyangelo.freites@gmail.com',
 	        'admin'    => true,
-            'password' => \Illuminate\Support\Facades\Hash::make('nextdots'),
+            'password' => \Illuminate\Support\Facades\Hash::make('secret'),
         ));
     }
 }

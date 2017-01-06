@@ -10,6 +10,8 @@ namespace App\Api\V1\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Api\V1\Models\Task;
+use App\Misc\LibMisc;
+
 
 class TaskController extends BaseController{
 
@@ -19,20 +21,11 @@ class TaskController extends BaseController{
 
 		$task = Task::find($id);
 
-		if(empty($task)){
-			return $this->response->errorNotFound("Task not found");
-		}
-
-		if($user->admin)
+		if($user->admin || $user->id == $task->user->i)
 		{
-			return $task;	
+			return LibMisc::showMessage($task);
 		}else{
-			if($user->id == $task->user->id)
-			{
-				return $task;
-			}else{
-				return $this->response->error('Not admin privileges', 200);
-			}
+			return LibMisc::notAdmin();
 		}
 		
 	}
@@ -43,19 +36,12 @@ class TaskController extends BaseController{
 
 		$task = Task::all();
 
-		if(empty($task)){
-			return $this->response->errorNotFound("Tasks Not Found");
-		}
-
 		if($user->admin)
 		{
-			return $task;
+			return LibMisc::showMessage($task);
 		}else{
 			$task = Task::where('user_id','=',$user->id)->get();
-			if($task->IsEmpty()){
-				return $this->response->errorNotFound("Tasks Not Found");
-			}
-			return $task;
+			return LibMisc::showMessage($task);
 		}
 	}
 
@@ -65,10 +51,8 @@ class TaskController extends BaseController{
 
 		$validator = Validator::make($request->all(), Task::rules());
 
-		if ($validator->fails())
-		{
-
-			return $this->response->error($validator->messages(), 200);
+		if ($validator->fails()) {
+			return LibMisc::validatorFails($validator->messages());
 		}
 
 		$user = \Auth::user();
@@ -80,7 +64,7 @@ class TaskController extends BaseController{
 		$task->user()->associate($user);
 		$task->save();
 
-		return $this->response->created($task->id,$task);
+		return LibMisc::createdMessage($task);
 	}
 
 	public function update($idTask, Request $request)
@@ -91,29 +75,16 @@ class TaskController extends BaseController{
 
 		if ($validator->fails())
 		{
-			return $this->response->error($validator->messages(), 200);
+			return LibMisc::validatorFails($validator->messages());
 		}
 
 		$userAuth = \Auth::user();
 
 		$task = Task::find($idTask);
 
-		if(empty($task)){
-			return $this->response->errorNotFound("Tasks Not Found");
-		}
+		if($userAuth->admin || $task->user->id == $userAuth->id){
 
-		if($userAuth->admin){
-
-			if($task->title != null)
-					$task->title = $request->title;
-				if($task->description != null)
-					$task->description = $request->description;
-				if($task->due_description != null)
-					$task->due_description = $request->due_description;
-				$task->save();
-				return response()->json([$task->id,$task]);
-		}else{
-			if($task->user->id == $userAuth->id)
+			if(isset($task) && $task != null)
 			{
 				if($task->title != null)
 					$task->title = $request->title;
@@ -122,10 +93,10 @@ class TaskController extends BaseController{
 				if($task->due_description != null)
 					$task->due_description = $request->due_description;
 				$task->save();
-				return response()->json([$task->id,$task]);
-			}else{
-				return $this->response->error('Tasks not found',200);
 			}
+			return libMisc::updatedMessage($task);
+		}else{
+			return LibMisc::notAdmin();
 		}
 	}
 
@@ -134,22 +105,15 @@ class TaskController extends BaseController{
 		$userAuth = \Auth::user();
 		$task = Task::find($id);
 
-		if(empty($task)){
-			return $this->response->errorNotFound("Tasks Not Found");
-		}
-
-		if($userAuth->admin)
+		if($userAuth->admin || $task->user->id == $userAuth->id)
 		{
-			$task->delete();
-			return response()->json([$task->id,$task]);
-		}else{
-			if($task->user->id == $userAuth->id)
+			if(isset($task) && $task != null)
 			{
 				$task->delete();
-				return response()->json([$task->id,$task]);
-			}else{
-				return $this->response->error('Not admin privileges', 200);
 			}
+			return LibMisc::deletedMessage($task);
+		}else{
+			return LibMisc::notAdmin();
 		}
 	}
 } 
