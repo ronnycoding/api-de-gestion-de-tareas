@@ -12,7 +12,7 @@ use App\Api\V1\Models\Priorities;
 use App\Api\V1\Models\Task;
 use App\Misc\LibMisc;
 
-class PrioritiesController extends BaseController implements Methods
+class PrioritiesController extends BaseController
 {
     public function show($idItem, $optItem=null)
     {

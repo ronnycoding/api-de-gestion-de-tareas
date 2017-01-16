@@ -11,7 +11,7 @@ namespace App\Api\V1\Controllers;
 use App\Api\V1\Models\Task;
 use App\Misc\LibMisc;
 
-class TaskController extends BaseController implements Methods
+class TaskController extends BaseController
 {
     public function show($idItem, $optItem=null)
     {
