@@ -10,39 +10,48 @@ class BaseController extends Controller
 {
     use Helpers;
 
-	protected $userAuth;
+    protected $userAuth;
 
-	protected $request;
+    protected $request;
 
-	public function __construct(Request $request)
-	{
-		$this->userAuth = \Auth::user();
-		$this->request = $request;
-	}
+    public function __construct(Request $request)
+    {
+        $this->userAuth = \Auth::user();
+        $this->request = $request;
+    }
 
-	public function getUserAth()
-	{
-		return $this->userAuth;
-	}
+    public function getUserAth()
+    {
+        return $this->userAuth;
+    }
 
-	public function getRequest()
-	{
-		return $this->request;
-	}
+    public function getRequest()
+    {
+        return $this->request;
+    }
 
-	public function validator($rules)
-	{
-		$validator = Validator::make($this->getRequest()->all(),$rules);
+    public function validator($rules)
+    {
+        $validator = Validator::make($this->getRequest()->all(), $rules);
 
-		if ($validator->fails())
-		{
-			die(LibMisc::validatorFails($validator->messages()));
-		}
-	}
+        if ($validator->fails()) {
+            die(LibMisc::validatorFails($validator->messages()));
+        }
+    }
 
-	public function show($idItem){}
-	public function showAll(){}
-	public function store($idItem=null){}
-	public function update($idItem=null){}
-	public function delete($idItem){}
+    public function show($idItem)
+    {
+    }
+    public function showAll()
+    {
+    }
+    public function store($idItem=null)
+    {
+    }
+    public function update($idItem=null)
+    {
+    }
+    public function delete($idItem)
+    {
+    }
 }

@@ -17,40 +17,38 @@ class TaskController extends BaseController
     {
         $task = Task::find($idItem);
 
-	    if($task != null)
-	    {
-		    if ($this->getUserAth ()->admin || $this->getUserAth ()->id == $task->user->id) {
-			    return LibMisc::showMessage($task);
-		    } else {
-			    return LibMisc::notAdmin();
-		    }
-	    }else{
-		    return LibMisc::showMessage($task);
-	    }
-
+        if ($task != null) {
+            if ($this->getUserAth()->admin || $this->getUserAth()->id == $task->user->id) {
+                return LibMisc::showMessage($task);
+            } else {
+                return LibMisc::notAdmin();
+            }
+        } else {
+            return LibMisc::showMessage($task);
+        }
     }
 
     public function showAll()
     {
         $task = Task::all();
 
-	    if($task != null) {
-		    if ($this->getUserAth()->admin) {
-			    return LibMisc::showMessage($task);
-		    } else {
-			    $task = Task::where('user_id', '=', $this->getUserAth()->id)->get();
-			    return LibMisc::showMessage($task);
-		    }
-	    }else{
-		    return LibMisc::showMessage($task);
-	    }
+        if ($task != null) {
+            if ($this->getUserAth()->admin) {
+                return LibMisc::showMessage($task);
+            } else {
+                $task = Task::where('user_id', '=', $this->getUserAth()->id)->get();
+                return LibMisc::showMessage($task);
+            }
+        } else {
+            return LibMisc::showMessage($task);
+        }
     }
 
     public function store($idItem=null)
     {
-	    $this->getRequest()->only(Task::$storeFields);
+        $this->getRequest()->only(Task::$storeFields);
 
-	    $this->validator(Task::rules());
+        $this->validator(Task::rules());
 
         $task = new Task();
         $task->title = $this->getRequest()->title;
@@ -64,51 +62,54 @@ class TaskController extends BaseController
 
     public function update($idItem=null, $idItemOpt=null)
     {
-	    $this->getRequest()->only(Task::$storeFields);
+        $this->getRequest()->only(Task::$storeFields);
 
-	    $this->validator(Task::rules());
+        $this->validator(Task::rules());
 
         $task = Task::find($idItem);
 
-	    if($task != null)
-	    {
-		    if ($this->getUserAth()->admin || $task->user->id == $this->getUserAth()->id) {
+        if ($task != null) {
+            if ($this->getUserAth()->admin || $task->user->id == $this->getUserAth()->id) {
+                if ($this->getRequest()->title != null) {
+                    if ($task->title != $this->getRequest()->title) {
+                        $task->title = $this->getRequest()->title;
+                    }
+                }
 
-			    if ($this->getRequest()->title != null)
-				    if($task->title != $this->getRequest()->title)
-				        $task->title = $this->getRequest()->title;
+                if ($this->getRequest()->description != null) {
+                    if ($task->description != $this->getRequest()->description) {
+                        $task->description = $this->getRequest()->description;
+                    }
+                }
 
-			    if ($this->getRequest()->description != null)
-			        if ($task->description != $this->getRequest()->description)
-				        $task->description = $this->getRequest()->description;
+                if ($this->getRequest()->due_description != null) {
+                    if ($task->due_description != $this->getRequest()->due_description) {
+                        $task->due_description = $this->getRequest()->due_description;
+                    }
+                }
 
-			    if ($this->getRequest()->due_description != null)
-			        if ($task->due_description != $this->getRequest()->due_description)
-				        $task->due_description = $this->getRequest()->due_description;
-
-			    $task->save();
-			    return libMisc::updatedMessage($task);
-		    } else {
-			    return LibMisc::notAdmin();
-		    }
-	    }else{
-		    return LibMisc::showMessage($task);
-	    }
+                $task->save();
+                return libMisc::updatedMessage($task);
+            } else {
+                return LibMisc::notAdmin();
+            }
+        } else {
+            return LibMisc::showMessage($task);
+        }
     }
 
     public function delete($idItem, $idItemOpt=null)
     {
         $task = Task::find($idItem);
-	    if($task != null)
-	    {
-		    if ($this->getUserAth()->admin || $task->user->id == $this->getUserAth()->id) {
-			    $task->delete();
-			    return LibMisc::deletedMessage($task);
-		    } else {
-			    return LibMisc::notAdmin();
-		    }
-	    }else{
-		    return LibMisc::showMessage($task);
-	    }
+        if ($task != null) {
+            if ($this->getUserAth()->admin || $task->user->id == $this->getUserAth()->id) {
+                $task->delete();
+                return LibMisc::deletedMessage($task);
+            } else {
+                return LibMisc::notAdmin();
+            }
+        } else {
+            return LibMisc::showMessage($task);
+        }
     }
 }

@@ -17,25 +17,22 @@ class PrioritiesController extends BaseController
     public function show($idItem, $optItem=null)
     {
         $task = Task::find($idItem);
-	    if($task != null)
-	    {
-		    if ($this->getUserAth()->admin)
-		    {
-			    $priority = $task->priorities()->contains($optItem);
-		    }else{
-			    $task = $this->getUserAth()->$task->contains($idItem);
-			    $priority = $task->priorities()->contains($optItem);
-		    }
+        if ($task != null) {
+            if ($this->getUserAth()->admin) {
+                $priority = $task->priorities()->contains($optItem);
+            } else {
+                $task = $this->getUserAth()->$task->contains($idItem);
+                $priority = $task->priorities()->contains($optItem);
+            }
 
-		    if($priority != null)
-		    {
-				return LibMisc::showMessage($priority);
-		    }else{
-			    return LibMisc::notAdmin();
-		    }
-	    }else{
-		    return LibMisc::showMessage($task);
-	    }
+            if ($priority != null) {
+                return LibMisc::showMessage($priority);
+            } else {
+                return LibMisc::notAdmin();
+            }
+        } else {
+            return LibMisc::showMessage($task);
+        }
     }
 
     public function showAll()
@@ -48,57 +45,54 @@ class PrioritiesController extends BaseController
             }])->get();
         }
 
-	    if($priority != null)
-	    {
-		    return LibMisc::showMessage($priority);
-	    }else{
-		    return LibMisc::notAdmin();
-	    }
+        if ($priority != null) {
+            return LibMisc::showMessage($priority);
+        } else {
+            return LibMisc::notAdmin();
+        }
     }
 
     public function store($idItem=null)
     {
-	    $this->getRequest()->only(Priorities::$storeFields);
-		$this->validator(Priorities::rules());
+        $this->getRequest()->only(Priorities::$storeFields);
+        $this->validator(Priorities::rules());
         $task = Task::find($idItem);
-	    if($task != null)
-	    {
-		    $priority = new Priorities();
-		    $priority->name = $this->getRequest()->name;
-		    $priority->task()->associate($task);
-		    $priority->save();
-	    }
+        if ($task != null) {
+            $priority = new Priorities();
+            $priority->name = $this->getRequest()->name;
+            $priority->task()->associate($task);
+            $priority->save();
+        }
 
-	    return LibMisc::createdMessage($priority);
+        return LibMisc::createdMessage($priority);
     }
 
     public function update($idItem=null, $idItemOpt=null)
     {
-	    $this->getRequest()->only(Priorities::$storeFields);
+        $this->getRequest()->only(Priorities::$storeFields);
 
-	    $this->validator(Priorities::rules());
+        $this->validator(Priorities::rules());
 
         $task = Task::find($idItem);
 
-	    $priority = null;
+        $priority = null;
 
-	    if($task != null)
-	    {
-		    $priority = $task->priorities()->contains($idItemOpt);
-		    if($priority != null)
-		    {
-			    if ($this->getUserAth()->admin || $priority->task->user->id == $this->getUserAth()->id)
-			    {
-				    if ($this->getRequest()->name != null)
-				        if ($priority->name =! $this->getRequest()->name)
-					        $priority->name = $this->getRequest()->name;
+        if ($task != null) {
+            $priority = $task->priorities()->contains($idItemOpt);
+            if ($priority != null) {
+                if ($this->getUserAth()->admin || $priority->task->user->id == $this->getUserAth()->id) {
+                    if ($this->getRequest()->name != null) {
+                        if ($priority->name =! $this->getRequest()->name) {
+                            $priority->name = $this->getRequest()->name;
+                        }
+                    }
 
-				    $priority->save();
-			    }
-		    }
-	    }
+                    $priority->save();
+                }
+            }
+        }
 
-	    return LibMisc::showMessage($priority);
+        return LibMisc::showMessage($priority);
     }
 
     public function delete($idItem, $idItemOpt=null)
@@ -111,7 +105,9 @@ class PrioritiesController extends BaseController
             $priority = $this->getUserAth()->tasks->priorities()->contains($idItemOpt);
         }
 
-	    if($priority == null) return LibMisc::createdMessage($priority);
+        if ($priority == null) {
+            return LibMisc::createdMessage($priority);
+        }
 
         if ($this->getUserAth()->admin || $priority->task()->user()->id == $this->getUserAth()->id) {
             $priority->delete();
