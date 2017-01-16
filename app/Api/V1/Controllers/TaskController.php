@@ -7,113 +7,108 @@
  */
 
 namespace App\Api\V1\Controllers;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+
 use App\Api\V1\Models\Task;
 use App\Misc\LibMisc;
 
+class TaskController extends BaseController implements Methods
+{
+    public function show($idItem, $optItem=null)
+    {
+        $task = Task::find($idItem);
 
-class TaskController extends BaseController{
+	    if($task != null)
+	    {
+		    if ($this->getUserAth ()->admin || $this->getUserAth ()->id == $task->user->id) {
+			    return LibMisc::showMessage($task);
+		    } else {
+			    return LibMisc::notAdmin();
+		    }
+	    }else{
+		    return LibMisc::showMessage($task);
+	    }
 
-	public function show($id)
-	{
-		$user = \Auth::user();
+    }
 
-		$task = Task::find($id);
+    public function showAll()
+    {
+        $task = Task::all();
 
-		if($user->admin || $user->id == $task->user->i)
-		{
-			return LibMisc::showMessage($task);
-		}else{
-			return LibMisc::notAdmin();
-		}
-		
-	}
+	    if($task != null) {
+		    if ($this->getUserAth()->admin) {
+			    return LibMisc::showMessage($task);
+		    } else {
+			    $task = Task::where('user_id', '=', $this->getUserAth()->id)->get();
+			    return LibMisc::showMessage($task);
+		    }
+	    }else{
+		    return LibMisc::showMessage($task);
+	    }
+    }
 
-	public function showAll()
-	{
-		$user = \Auth::user();
+    public function store($idItem=null)
+    {
+	    $this->getRequest()->only(Task::$storeFields);
 
-		$task = Task::all();
+	    $this->validator(Task::rules());
 
-		if($user->admin)
-		{
-			return LibMisc::showMessage($task);
-		}else{
-			$task = Task::where('user_id','=',$user->id)->get();
-			return LibMisc::showMessage($task);
-		}
-	}
+        $task = new Task();
+        $task->title = $this->getRequest()->title;
+        $task->description = $this->getRequest()->description;
+        $task->due_description = $this->getRequest()->due_description;
+        $task->user()->associate($this->getUserAth());
+        $task->save();
 
-	public function store(Request $request)
-	{
-		$request->only(Task::$storeFields);
+        return LibMisc::createdMessage($task);
+    }
 
-		$validator = Validator::make($request->all(), Task::rules());
+    public function update($idItem=null, $idItemOpt=null)
+    {
+	    $this->getRequest()->only(Task::$storeFields);
 
-		if ($validator->fails()) {
-			return LibMisc::validatorFails($validator->messages());
-		}
+	    $this->validator(Task::rules());
 
-		$user = \Auth::user();
+        $task = Task::find($idItem);
 
-		$task = new Task();
-		$task->title = $request->title;
-		$task->description = $request->description;
-		$task->due_description = $request->due_description;
-		$task->user()->associate($user);
-		$task->save();
+	    if($task != null)
+	    {
+		    if ($this->getUserAth()->admin || $task->user->id == $this->getUserAth()->id) {
 
-		return LibMisc::createdMessage($task);
-	}
+			    if ($this->getRequest()->title != null)
+				    if($task->title != $this->getRequest()->title)
+				        $task->title = $this->getRequest()->title;
 
-	public function update($idTask, Request $request)
-	{
-		$request->only(Task::$storeFields);
+			    if ($this->getRequest()->description != null)
+			        if ($task->description != $this->getRequest()->description)
+				        $task->description = $this->getRequest()->description;
 
-		$validator = Validator::make($request->all(), Task::rules());
+			    if ($this->getRequest()->due_description != null)
+			        if ($task->due_description != $this->getRequest()->due_description)
+				        $task->due_description = $this->getRequest()->due_description;
 
-		if ($validator->fails())
-		{
-			return LibMisc::validatorFails($validator->messages());
-		}
+			    $task->save();
+			    return libMisc::updatedMessage($task);
+		    } else {
+			    return LibMisc::notAdmin();
+		    }
+	    }else{
+		    return LibMisc::showMessage($task);
+	    }
+    }
 
-		$userAuth = \Auth::user();
-
-		$task = Task::find($idTask);
-
-		if($userAuth->admin || $task->user->id == $userAuth->id){
-
-			if(isset($task) && $task != null)
-			{
-				if($task->title != null)
-					$task->title = $request->title;
-				if($task->description != null)
-					$task->description = $request->description;
-				if($task->due_description != null)
-					$task->due_description = $request->due_description;
-				$task->save();
-			}
-			return libMisc::updatedMessage($task);
-		}else{
-			return LibMisc::notAdmin();
-		}
-	}
-
-	public function delete($id)
-	{
-		$userAuth = \Auth::user();
-		$task = Task::find($id);
-
-		if($userAuth->admin || $task->user->id == $userAuth->id)
-		{
-			if(isset($task) && $task != null)
-			{
-				$task->delete();
-			}
-			return LibMisc::deletedMessage($task);
-		}else{
-			return LibMisc::notAdmin();
-		}
-	}
-} 
+    public function delete($idItem, $idItemOpt=null)
+    {
+        $task = Task::find($idItem);
+	    if($task != null)
+	    {
+		    if ($this->getUserAth()->admin || $task->user->id == $this->getUserAth()->id) {
+			    $task->delete();
+			    return LibMisc::deletedMessage($task);
+		    } else {
+			    return LibMisc::notAdmin();
+		    }
+	    }else{
+		    return LibMisc::showMessage($task);
+	    }
+    }
+}

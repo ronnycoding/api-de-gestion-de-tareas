@@ -1,110 +1,119 @@
 <?php namespace App\Api\V1\Controllers;
 
 use App\Api\V1\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Misc\LibMisc;
 
-class UserController extends BaseController {
+class UserController extends BaseController
+{
+    public function show($idItem, $optItem=null)
+    {
+        $user = User::find($idItem);
 
-	public function show($id)
-	{
-		$userAuth = \Auth::user();
-		$user = User::find($id);
+	    if($user != null)
+	    {
+		    if ($this->getUserAth()->admin || $user->id == $this->getUserAth()->id)
+		    {
+			    return LibMisc::showMessage($user);
+		    }else{
+			    return LibMisc::notAdmin();
+		    }
+	    }else{
+		    return LibMisc::showMessage($user);
+	    }
+    }
 
-		if($userAuth->admin || $user->id == $userAuth->id)
-		{
-			return LibMisc::showMessage($user, new User());
-		}else{
-			return LibMisc::notAdmin();
-		}
-	}
+    public function showAll()
+    {
+        $user = User::all();
 
-	public function showAll()
-	{
-		$userAuth = \Auth::user();
-		$user = User::all();
+	    if($user != null)
+	    {
+		    if ($this->getUserAth ()->admin) {
+			    return LibMisc::showMessage ($user);
+		    } else {
+			    return LibMisc::notAdmin ();
+		    }
+	    }else{
+		    return LibMisc::showMessage($user);
+	    }
+    }
 
-		if($userAuth->admin)
-		{
-			return $user;
-		}else{
-			return LibMisc::notAdmin();
-		}
-	}
+    public function store($idItem=null)
+    {
+	    $this->getRequest()->only(User::$storeFields);
 
-	public function store(Request $request)
-	{
-		$request->only(User::$storeFields);
-		$validator = Validator::make($request->all(), User::rules());
-		if ($validator->fails())
-		{
-			return LibMisc::validatorFails($validator->messages());
-		}
-		$user = \Auth::user();
-		if($user->admin){
-			$newUser = new User();
-			$newUser->firstname = $request->firstname;
-			$newUser->lastname = $request->lastname;
-			$newUser->email = $request->email;
-			$newUser->password = \Illuminate\Support\Facades\Hash::make($request->password);
-			$newUser->admin = $request->admin ? true : false;
-			$newUser->save();
-			return LibMisc::createdMessage($newUser);
-		}else{
-			return LibMisc::notAdmin();
-		}
-	}
+	    $this->validator(User::rules());
 
-	public function update($id, Request $request)
-	{
-		$request->only(User::$updateFields);
-		$validator = Validator::make($request->all(), User::rules());
-		if ($validator->fails())
-		{
-			return LibMisc::validatorFails($validator->messages());
-		}
-		$userAuth = \Auth::user();
-		$user = User::find($id);
-		if($userAuth->admin || $user->id == $userAuth->id){
-			if(!empty($user) && isset($user))
-			{
-				if($request->firstname != null)
-					if($user->firstname != $request->firstname)
-						$user->firstname = $request->firstname;
-				if($request->lastname != null)
-					if($user->lastname != $request->lastname)
-						$user->lastname = $request->lastname;
-				if($request->email != null)
-					if($user->email != $request->email)
-						$user->email = $request->email;
-				if($user->password != null)
-					if($user->password != $request->password)
-						$user->password = \Illuminate\Support\Facades\Hash::make($request->password);
-				if($user->admin != null)
-					if($user->admin != $request->admin)
-						$user->admin = $request->admin ? true : false;
-				$user->save();
-			}
-			return LibMisc::createdMessage($user);
-		}else{
-			return LibMisc::notAdmin();
-		}
-	}
+        if ($this->getUserAth()->admin) {
+            $newUser = new User();
+            $newUser->firstname = $this->getRequest()->firstname;
+            $newUser->lastname = $this->getRequest()->lastname;
+            $newUser->email = $this->getRequest()->email;
+            $newUser->password = \Illuminate\Support\Facades\Hash::make($this->getRequest()->password);
+            $newUser->admin = $this->getRequest()->admin ? true : false;
+            $newUser->save();
+            return LibMisc::createdMessage($newUser);
+        } else {
+            return LibMisc::notAdmin();
+        }
+    }
 
-	public function delete($id)
-	{
-		$userAuth = \Auth::user();
-		$user = User::find($id);
-		if($userAuth->admin || $user->id == $userAuth->id)
-		{
-			if(isset($user) && $user != null)
-			{
-				$user->delete();
-			}
-			return LibMisc::deletedMessage($user);
-		}else{
-			return LibMisc::notAdmin();
-		}
-	}
+    public function update($idItem=null)
+    {
+	    dd($idItem);
+        $this->getRequest()->only(User::$updateFields);
+
+        $user = User::find($idItem);
+
+	    if($user != null)
+	    {
+		    if ($this->getUserAth()->admin || $user->id == $this->getUserAth()->admin->id)
+		    {
+
+			    if ($this->getRequest()->firstname != null)
+				    if ($user->firstname != $this->getRequest()->firstname)
+					    $user->firstname = $this->getRequest()->firstname;
+
+			    if ($this->getRequest()->lastname != null)
+				    if ($user->lastname != $this->getRequest()->lastname)
+					    $user->lastname = $this->getRequest()->lastname;
+
+			    if ($this->getRequest()->email != null)
+				    if ($user->email != $this->getRequest()->email)
+					    $user->email = $this->getRequest()->email;
+
+			    if ($this->getRequest()->password != null)
+				    if ($user->password != $this->getRequest()->password)
+					    $user->password = \Illuminate\Support\Facades\Hash::make($this->getRequest()->password);
+
+			    if ($this->getRequest()->admin != null)
+				    if ($user->admin != $this->getRequest()->admin)
+					    $user->admin = $this->getRequest()->admin ? true : false;
+
+			    $user->save();
+
+			    return LibMisc::createdMessage($user);
+		    } else {
+			    return LibMisc::notAdmin();
+		    }
+	    }else{
+		    return LibMisc::showMessage($user);
+	    }
+    }
+
+    public function delete($idItem)
+    {
+        $user = User::find($idItem);
+	    if($user != null)
+	    {
+		    if ($this->getUserAth()->admin || $user->id == $this->getUserAth()->id) {
+			        $user->delete();
+			    return LibMisc::deletedMessage($user);
+		    } else {
+			    return LibMisc::notAdmin();
+		    }
+	    }else{
+		    return LibMisc::showMessage($user);
+	    }
+    }
 }

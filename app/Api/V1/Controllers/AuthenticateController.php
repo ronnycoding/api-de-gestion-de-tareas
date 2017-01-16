@@ -4,8 +4,8 @@ use Dingo\Api\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\JWTAuth;
 
-class AuthenticateController extends BaseController {
-
+class AuthenticateController extends BaseController
+{
     protected $auth;
     public function __construct(JWTAuth $auth)
     {
@@ -20,11 +20,9 @@ class AuthenticateController extends BaseController {
                 return response()->json(['error' => 'invalid_credentials'], 401);
             }
         } catch (JWTException $e) {
-
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
 
         return response()->json(compact('token'));
     }
-
 }

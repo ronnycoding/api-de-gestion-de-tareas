@@ -7,119 +7,117 @@
  */
 
 namespace App\Api\V1\Controllers;
+
 use App\Api\V1\Models\Priorities;
 use App\Api\V1\Models\Task;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Misc\LibMisc;
 
-class PrioritiesController extends BaseController{
-	public function show($idTask, $idPriority)
-	{
-		$task = Task::find($idTask);
-		$user = \Auth::user();
+class PrioritiesController extends BaseController implements Methods
+{
+    public function show($idItem, $optItem=null)
+    {
+        $task = Task::find($idItem);
+	    if($task != null)
+	    {
+		    if ($this->getUserAth()->admin)
+		    {
+			    $priority = $task->priorities()->contains($optItem);
+		    }else{
+			    $task = $this->getUserAth()->$task->contains($idItem);
+			    $priority = $task->priorities()->contains($optItem);
+		    }
 
-		if($user->admin)
-		{
-			$priority = Priorities::find($idPriority);
-		}else{
-			$priority = $user->tasks->priorities()->contains($idPriority);
-		}
+		    if($priority != null)
+		    {
+				return LibMisc::showMessage($priority);
+		    }else{
+			    return LibMisc::notAdmin();
+		    }
+	    }else{
+		    return LibMisc::showMessage($task);
+	    }
+    }
 
-		return LibMisc::showMessage($priority);
-	}
+    public function showAll()
+    {
+        if ($this->getUserAth()->admin) {
+            $priority = Priorities::all();
+        } else {
+            $priority = Priorities::with(['priorities.tasks' => function ($query) {
+                $query->where('user_id', '=', $this->getUserAth()->id)->orderBy('created_at', 'desc');
+            }])->get();
+        }
 
-	public function showAll()
-	{
-		$user = \Auth::user();
+	    if($priority != null)
+	    {
+		    return LibMisc::showMessage($priority);
+	    }else{
+		    return LibMisc::notAdmin();
+	    }
+    }
 
-		if($user->admin)
-		{
-			$priority = Priorities::all();
-		}else{
-			$priority = Priorities::with(['priorities.tasks' => function ($query) {
-    			$query->where('user_id','=',$user->id)->orderBy('created_at', 'desc');
-			}])->get();
-		}
+    public function store($idItem=null)
+    {
+	    $this->getRequest()->only(Priorities::$storeFields);
+		$this->validator(Priorities::rules());
+        $task = Task::find($idItem);
+	    if($task != null)
+	    {
+		    $priority = new Priorities();
+		    $priority->name = $this->getRequest()->name;
+		    $priority->task()->associate($task);
+		    $priority->save();
+	    }
 
-		return LibMisc::showMessage($priority);
-	}
+	    return LibMisc::createdMessage($priority);
+    }
 
-	public function store($idTask, Request $request)
-	{
-		$request->only(Priorities::$storeFields);
-		$validator = Validator::make($request->all(), Priorities::rules());
+    public function update($idItem=null, $idItemOpt=null)
+    {
+	    $this->getRequest()->only(Priorities::$storeFields);
 
-		if ($validator->fails())
-			return LibMisc::validatorFails($validator->messages());
+	    $this->validator(Priorities::rules());
 
-		$task = Task::find($idTask);
-		$user = \Auth::user();
-		if(!empty($task) && isset($task))
-		{
-			$priority = new Priorities();
-			$priority->name = $request->name;
-			$priority->task()->associate($task);
-			$priority->save();
-			return LibMisc::createdMessage($priority);
-		}
-	}
+        $task = Task::find($idItem);
 
-	public function update($idTask, $idPriority, Request $request)
-	{
-		$request->only(Priorities::$storeFields);
-		$validator = Validator::make($request->all(), Priorities::rules());
-		if ($validator->fails())
-			return LibMisc::validatorFails($validator->messages());
-		$task = Task::find($idTask);
-		if(empty($task) && !isset($task))
-		{
-			return LibMisc::validatorFails('Task not found');
-		}
+	    $priority = null;
 
-		$priority = Priorities::find($idPriority);
+	    if($task != null)
+	    {
+		    $priority = $task->priorities()->contains($idItemOpt);
+		    if($priority != null)
+		    {
+			    if ($this->getUserAth()->admin || $priority->task->user->id == $this->getUserAth()->id)
+			    {
+				    if ($this->getRequest()->name != null)
+				        if ($priority->name =! $this->getRequest()->name)
+					        $priority->name = $this->getRequest()->name;
 
-		if(empty($priority)  && !isset($priority))
-		{
-			return LibMisc::validatorFails('Priority not found');
-		}
+				    $priority->save();
+			    }
+		    }
+	    }
 
-		$userAuth = \Auth::user();
+	    return LibMisc::showMessage($priority);
+    }
 
-		if($userAuth->admin || $priority->task->user->id == $userAuth->id)
-		{
-			if($priority->name =! $request->name)
-				$priority->name = $request->name;
-					$priority->save();
-		}else{
-			$priority = null;
-		}
-		return LibMisc::updatedMessage($priority);
-	}
+    public function delete($idItem, $idItemOpt=null)
+    {
+        $task = Task::find($idItem);
 
-	public function delete($idTask, $idPriority)
-	{
-		$task = Task::find($idTask);
+        if ($this->getUserAth()->admin) {
+            $priority = $task->priorities()->contains($idItemOpt);
+        } else {
+            $priority = $this->getUserAth()->tasks->priorities()->contains($idItemOpt);
+        }
 
-		if(empty($task)  && !isset($task))
-		{
-			return LibMisc::validatorFails('Task not found');
-		}
+	    if($priority == null) return LibMisc::createdMessage($priority);
 
-		$user = \Auth::user();
-		if($user->admin)
-		{
-			$priority = Priorities::find($idPriority);
-		}else{
-			$priority = $user->tasks->priorities()->contains($idPriority);
-		}
-
-		if($user->admin || $priority->task()->user()->id == $user->id)
-		{
-			$priority->delete();
-			return LibMisc::deletedMessage($priority);
-		}else{
-			return LibMisc::notAdmin();
-		}
-	}
-} 
+        if ($this->getUserAth()->admin || $priority->task()->user()->id == $this->getUserAth()->id) {
+            $priority->delete();
+            return LibMisc::deletedMessage($priority);
+        } else {
+            return LibMisc::notAdmin();
+        }
+    }
+}
