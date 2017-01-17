@@ -44,7 +44,7 @@ class TaskController extends BaseController
         }
     }
 
-    public function store($idItem=null)
+    public function store()
     {
         $this->getRequest()->only(Task::$storeFields);
 

@@ -3,7 +3,7 @@
 use App\Api\V1\Models\User;
 use App\Misc\LibMisc;
 
-class UserController extends BaseController
+class UsersController extends BaseController
 {
     public function show($idItem)
     {
@@ -35,7 +35,7 @@ class UserController extends BaseController
         }
     }
 
-    public function store($idItem=null)
+    public function store()
     {
         $this->getRequest()->only(User::$storeFields);
 
