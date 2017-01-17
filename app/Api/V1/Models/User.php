@@ -15,7 +15,7 @@ class User extends Model implements Authenticatable, JWTSubject
 {
     use \Illuminate\Auth\Authenticatable;
 
-    protected $primarykey = 'id';
+    public $primaryKey = 'id';
 
     protected $fillable = ['firstname', 'lastname', 'email', 'email', 'password','admin'];
 

@@ -5,7 +5,7 @@ use App\Misc\LibMisc;
 
 class UserController extends BaseController
 {
-    public function show($idItem, $optItem=null)
+    public function show($idItem)
     {
         $user = User::find($idItem);
 
@@ -55,9 +55,8 @@ class UserController extends BaseController
         }
     }
 
-    public function update($idItem=null)
+    public function update($idItem)
     {
-        dd($idItem);
         $this->getRequest()->only(User::$updateFields);
 
         $user = User::find($idItem);
@@ -96,7 +95,7 @@ class UserController extends BaseController
 
                 $user->save();
 
-                return LibMisc::createdMessage($user);
+                return LibMisc::updatedMessage($user);
             } else {
                 return LibMisc::notAdmin();
             }

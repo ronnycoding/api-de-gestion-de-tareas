@@ -38,20 +38,4 @@ class BaseController extends Controller
             die(LibMisc::validatorFails($validator->messages()));
         }
     }
-
-    public function show($idItem)
-    {
-    }
-    public function showAll()
-    {
-    }
-    public function store($idItem=null)
-    {
-    }
-    public function update($idItem=null)
-    {
-    }
-    public function delete($idItem)
-    {
-    }
 }

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
-    protected $primarykey = 'id';
+    protected $primaryKey = 'id';
 
     protected $table = 'tasks';
 
@@ -32,22 +32,13 @@ class Task extends Model
 
     public static $updateFields = ['id', 'title', 'description', 'due_description'];
 
-    /**
-     * Eloquent relationship
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Eloquent relationship
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function priorities()
     {
-        return $this->hasMany(Prorities::class);
+        return $this->hasMany(Priorities::class);
     }
 }

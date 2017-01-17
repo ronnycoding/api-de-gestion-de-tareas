@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Priorities extends Model
 {
-    protected $primarykey = 'id';
+    protected $primaryKey = 'id';
 
     protected $table = 'priorities';
 
@@ -28,6 +28,6 @@ class Priorities extends Model
 
     public function task()
     {
-        return $this->belongsTo(Task::class);
+        return $this->belongsTo(Task::class, 'task_id');
     }
 }

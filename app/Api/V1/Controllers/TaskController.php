@@ -13,7 +13,7 @@ use App\Misc\LibMisc;
 
 class TaskController extends BaseController
 {
-    public function show($idItem, $optItem=null)
+    public function show($idItem)
     {
         $task = Task::find($idItem);
 
@@ -60,7 +60,7 @@ class TaskController extends BaseController
         return LibMisc::createdMessage($task);
     }
 
-    public function update($idItem=null, $idItemOpt=null)
+    public function update($idItem)
     {
         $this->getRequest()->only(Task::$storeFields);
 
@@ -98,7 +98,7 @@ class TaskController extends BaseController
         }
     }
 
-    public function delete($idItem, $idItemOpt=null)
+    public function delete($idItem)
     {
         $task = Task::find($idItem);
         if ($task != null) {

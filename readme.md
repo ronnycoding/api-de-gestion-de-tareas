@@ -1,21 +1,176 @@
-# Lumen PHP Framework
+Api para gestion de tareas realizado con # Lumen PHP Framework por Ronny Freites
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://poser.pugx.org/laravel/lumen-framework/d/total.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/lumen-framework/v/stable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/lumen-framework/v/unstable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://poser.pugx.org/laravel/lumen-framework/license.svg)](https://packagist.org/packages/laravel/lumen-framework)
+Pasos para instalación
+1. Asegurate de tener instalado git en tu sistema operativo.
+2. clona el repositorio hacia tu directorio de trabajo con el comando git clone git@github.com:rfreites/api-de-gestion-de-tareas.git
+3. realiza un composer install de tu aplicación.
+4. conectate a tu base motor de base local mysql y crea una base de datos llamada gestiontareas
+5. corre el comando dentro del directorio de tu aplicacion "php artisan migrate --seed"
+6. corre el comando "php -S localhost:8000 -t ./public" para levantar el servidor de php
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+Veras que se habra creado un usuario por defecto, el cual tiene privilegios de administrador con el que puede crear
+y actualizar otros usuarios del sistema.
 
-## Official Documentation
+Por defecto existe un usuario en el sistema:
 
-Documentation for the framework can be found on the [Lumen website](http://lumen.laravel.com/docs).
+Para obtener el token de autenticación de este usuario realiza el siguiente postman:
 
-## Security Vulnerabilities
+Method: Post
+ruta: /api/authenticate
+Parametros:
+email = ronnyangelo.freites@gmail.com
+password = secret
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+http://localhost:8000/api/authenticate?email=ronnyangelo.freites@gmail.com&password=secret
 
-## License
+Obtendrás un token con el cual podrás gestionar la api.
 
-The Lumen framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+-Usuarios
+
+Agregar usuario
+
+Method: POST
+ruta: /api/users/add
+Parametros:
+token = tu token de autenticación
+firstname = nombre
+lastname = apellido
+email = correo electrónico
+password = contraseña
+admin = para asignarle privilegios de administrador (1 ó 0)
+
+http://localhost:8000/api/users/add?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA&firstname=Juan D.&lastname=Freites&email=jfreites@gmail.com&password=secret&admin=0&XDEBUG_START_SESSION=PHPSTORM
+
+Actualizar usuario
+
+Method: PUT
+ruta: /api/users/{id_del_usuario}
+Parametros:
+token = tu token de autenticación
+firstname = nombre
+lastname = apellido
+email = correo electrónico
+password = contraseña
+admin = para asignarle privilegios de administrador (1 ó 0)
+
+http://localhost:8000/api/users/2?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA&firstname=Jeffery A.&lastname=Sato&email=jfreites@gmail.com&password=secret&admin=0
+
+Mostrar usuario en especifico
+
+Method: GET
+ruta: /api/users/{id_del_usuario}
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/users/2?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA
+
+Mostrar todos los usuarios
+Method: GET
+ruta: /api/users
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/users?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA
+
+Eliminar usuario
+Method: DELETE
+ruta: /api/users/{id_del_usuario}
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/users/2?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA
+
+-Tareas
+
+Agregar tarea
+Method: POST
+ruta: /api/api/tasks/add
+Parametros:
+token = tu token de autenticación
+title = título de la tarea
+description = description de la tarea
+due_description = fecha formato admitido AAAA-MM-DD
+
+http://localhost:8000/api/tasks/add?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA&title=Mi primera tarea&description=descripcion de mi tarea&due_description=2017-07-24
+
+Actualizar tarea
+Method: PUT
+ruta: /api/tasks/{id_tarea}
+Parametros:
+token = tu token de autenticación
+title = título de la tarea
+description = description de la tarea
+due_description = fecha formato admitido AAAA-MM-DD
+
+http://localhost:8000/api/tasks/1?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA&title=Mi primera tarea&description=descripcion de mi tarea&due_description=2017-07-27
+
+Mostrar tarea especifica
+Method: GET
+ruta: /api/tasks/{id_tarea}
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/tasks/1?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA&title=Mi primera tarea&description=descripcion de mi tarea&due_description=2017-07-27
+
+Mostrar todas las tareas
+Method: GET
+ruta: /api/tasks
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/tasks?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA&title=Mi primera tarea&description=descripcion de mi tarea&due_description=2017-07-27
+
+Emilinar tarea
+Method: DELETE
+ruta: /api/tasks/{id_tarea}
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/tasks/2?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA
+
+-Prioridades
+
+Agregar prioridad
+Method: POST
+ruta: /api/tasks/{id_tarea}/priorities/add
+Agregar prioridad
+token = tu token de autenticación
+name = nombre de la prioridad
+
+http://localhost:8000/api/tasks/1/priorities/add?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA&name=Mi primera prioridad
+
+Actualizar una prioridad
+Method: PUT
+ruta: /api/tasks/{id_tarea}/priorities/{id_prioridad}
+Parametros:
+token = tu token de autenticación
+name = nombre de la prioridad
+
+http://localhost:8000/api/tasks/1/priorities/1?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA&name=Mi primera prioridad modificada
+
+Mostrar prioridad especifica
+Method: GET
+ruta: /api/tasks/{id_tarea}/priorities/{id_prioridad}
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/tasks/1/priorities/1?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA
+
+Mostrar todas las prioridades
+Method: GET
+ruta: /api/tasks/{id_tarea}/priorities
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/tasks/1/priorities?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA
+
+
+Eliminar prioridad
+Method: DELETE
+ruta: /api/tasks/{id_tarea}/priorities/{id_prioridad}
+Parametros:
+token = tu token de autenticación
+
+http://localhost:8000/api/tasks/1/priorities/1?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2x1bWVuand0L3B1YmxpYy9hcGkvYXV0aGVudGljYXRlIiwiaWF0IjoxNDg0NjI2NzcwLCJuYmYiOjE0ODQ2MjY3NzAsImp0aSI6IjRiOGU4YTQxMjdkMmM1MzVmNjZiZDY1ZjNlNTUwMTk5Iiwic3ViIjoxfQ.ybBxlMH7BqIFPmvM1KLCTR5PcQISAiHQM1kulE-1pTA
+
+
